@@ -7,9 +7,9 @@
       <fieldForLabel>Site</fieldForLabel>
       <fieldForValue>host</fieldForValue>
       <search>
-        <query>| inputlookup sites_groups.csv | stats values(host) AS host BY Site,roles | eval host=mvjoin(host,",") | eval host=replace(host,","," OR host=") | eval host="host=" + host | search [| rest splunk_server=local /services/authentication/users/$env:user$ | fields roles]
+        <query>| inputlookup sites_groups.csv | stats values(host) AS host BY Site,roles | eval host=mvjoin(host,",")  | search [| rest splunk_server=local /services/authentication/users/$env:user$ | fields roles]
 | appendpipe [| stats values(host) AS host
-| eval host = mvjoin(host, " OR "), Site="My Primary Sites", roles="*"]
+| eval host = mvjoin(host, ","), Site="My Primary Sites", roles="*"]
 | reverse</query>
         <earliest>-24h@h</earliest>
         <latest>now</latest>
@@ -18,7 +18,7 @@
         </done>
       </search>
       <default>$defaultValue$</default>
-      <delimiter> OR </delimiter>
+      <delimiter>,</delimiter>
     </input>
     <input type="time" token="field1">
       <label>Time period</label>
@@ -41,7 +41,7 @@
       <single>
         <title>Traffic types</title>
         <search>
-          <query>| pivot Network_Traffic Traffic_By_Action count(Traffic_By_Action) AS "Count of Traffic By Action" SPLITROW action AS action SORT 100 action ROWSUMMARY 0 COLSUMMARY 0 SHOWOTHER 1</query>
+          <query>| pivot Network_Traffic Traffic_By_Action count(Traffic_By_Action) AS "Count of Traffic By Action" SPLITROW action AS action FILTER host in ($hosts_token$) SORT 100 action ROWSUMMARY 0 COLSUMMARY 0 SHOWOTHER 1</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -56,7 +56,7 @@
       <chart>
         <title>Top Rules (ACL)</title>
         <search>
-          <query>| pivot Network_Traffic All_Traffic count(All_Traffic) AS "Count of All Traffic" SPLITROW rule AS rule TOP 100 count(All_Traffic) ROWSUMMARY 0 COLSUMMARY 0 SHOWOTHER 1</query>
+          <query>| pivot Network_Traffic All_Traffic count(All_Traffic) AS "Count of All Traffic" SPLITROW rule AS rule FILTER host in ($hosts_token$) TOP 100 count(All_Traffic) ROWSUMMARY 0 COLSUMMARY 0 SHOWOTHER 1</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -73,7 +73,7 @@
       <event>
         <title>Activity</title>
         <search>
-          <query>index=* $hosts_token$</query>
+          <query>index=* host IN ($hosts_token$)</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
