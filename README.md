@@ -5,4 +5,4 @@
 Shows a panel filtered by hosts that the user is interested in/has access to, populated by a lookup file.
 This provides search-level access control.
 
-![Screenshot](/static/screenshotpng)
+![Screenshot](/static/screenshot.png)
