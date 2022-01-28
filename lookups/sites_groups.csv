@@ -1,0 +1,4 @@
+Site,host,roles
+Oslo,osl-c-001-rtr-1,firewall_site_oslo
+Oslo,osl-c-001-fw-1,firewall_site_oslo
+Porsgrunn,por-c-001-fw-1,firewall_site_porsgrunn
